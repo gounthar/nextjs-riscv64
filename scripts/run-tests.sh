@@ -5,8 +5,11 @@ set -euo pipefail
 # Automates testing of Next.js applications on Banana Pi F3
 
 # Configuration
-TEST_DIR="${1:-tests/pages-router}"
-OUTPUT_DIR="docs/testing"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+TEST_DIR_REL="${1:-tests/pages-router}"
+TEST_DIR="${PROJECT_ROOT}/${TEST_DIR_REL}"
+OUTPUT_DIR="${PROJECT_ROOT}/docs/testing"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 REPORT_FILE="${OUTPUT_DIR}/test-report-${TIMESTAMP}.md"
 
