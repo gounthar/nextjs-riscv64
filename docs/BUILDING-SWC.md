@@ -415,7 +415,78 @@ Links:
 - Issue #3: Prebuilt Binaries Strategy
 - PR #8: Babel Fallback Solution
 
+## Actual Build Experience (2025-11-14)
+
+### Environment
+- **Hardware**: Banana Pi F3 (riscv64, 8 cores, 15GB RAM)
+- **OS**: Debian 13
+- **Node.js**: v24.11.1
+- **Rust**: 1.91.1 (stable) + nightly-2023-10-06
+
+### Build Process
+
+1. **Install Rust** ✅ (2 minutes)
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+source "$HOME/.cargo/env"
+```
+
+2. **Install pnpm** ✅ (1 minute)
+```bash
+sudo npm install -g pnpm
+```
+
+3. **Clone Next.js** ✅ (5 minutes, 25,901 files)
+```bash
+git clone https://github.com/vercel/next.js.git ~/next.js
+cd ~/next.js
+git checkout v13.5.6
+```
+
+4. **Install Nightly Toolchain** ✅ (3 minutes)
+```bash
+rustup toolchain install nightly-2023-10-06-riscv64gc-unknown-linux-gnu
+```
+
+5. **Install Dependencies** ⚠️ (1 minute, with warnings)
+```bash
+cd ~/next.js
+pnpm install --ignore-scripts
+```
+Note: turbo package doesn't support riscv64 (expected), but this doesn't affect SWC build.
+
+6. **Build with Cargo** 🔄 (2-4 hours estimated)
+```bash
+cd ~/next.js/packages/next-swc
+source "$HOME/.cargo/env"
+cargo build --release --manifest-path crates/napi/Cargo.toml
+```
+
+### Key Findings
+
+- ✅ All prerequisites install smoothly on riscv64
+- ✅ Rust nightly-2023-10-06 is required (specified in rust-toolchain file)
+- ⚠️ `pnpm build-native` fails due to missing @napi-rs/cli
+- ✅ Direct cargo build works: `cargo build --release --manifest-path crates/napi/Cargo.toml`
+- ⏱️ Dependency fetching phase: ~10-20 minutes
+- ⏱️ Total build time: 2-4 hours (ongoing)
+
+### Recommended Build Command
+
+```bash
+# Navigate to next-swc package
+cd ~/next.js/packages/next-swc
+
+# Build with cargo directly
+source "$HOME/.cargo/env"
+cargo build --release --manifest-path crates/napi/Cargo.toml
+
+# Output location
+# target/release/libnext_swc_napi.so (needs to be renamed to .node)
+```
+
 ## Updates
 
 - **2025-11-14**: Initial documentation created
-- **Next**: Test build process on Banana Pi F3
+- **2025-11-14**: Started actual build test on Banana Pi F3 - build in progress
+- **Next**: Complete build and test binaries
