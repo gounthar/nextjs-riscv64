@@ -1,0 +1,215 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+body {
+  color: #333;
+  background: #fff;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+code {
+  background: #fafafa;
+  border-radius: 5px;
+  padding: 0.2rem 0.4rem;
+  font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
+    Bitstream Vera Sans Mono, Courier New, monospace;
+  font-size: 0.9em;
+}
+
+.container {
+  min-height: 100vh;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  padding: 4rem 0;
+}
+
+.title {
+  margin: 0 0 1rem;
+  line-height: 1.15;
+  font-size: 3rem;
+  text-align: center;
+}
+
+.nextjs {
+  color: #0070f3;
+}
+
+.description {
+  text-align: center;
+  line-height: 1.5;
+  font-size: 1.2rem;
+  margin: 2rem 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  width: 100%;
+  max-width: 800px;
+  margin: 2rem 0;
+}
+
+.card {
+  padding: 1.5rem;
+  text-align: left;
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid #eaeaea;
+  border-radius: 10px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+}
+
+.card:hover {
+  color: #0070f3;
+  border-color: #0070f3;
+}
+
+.card h2 {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+}
+
+.card p {
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+.info {
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.info p {
+  margin: 0.5rem 0;
+}
+
+.backLink {
+  margin-top: 2rem;
+  color: #0070f3;
+  text-decoration: none;
+  font-size: 1.1rem;
+}
+
+.backLink:hover {
+  text-decoration: underline;
+}
+
+.button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  background-color: #0070f3;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 1rem 0;
+  transition: background-color 0.2s ease;
+}
+
+.button:hover:not(:disabled) {
+  background-color: #0051cc;
+}
+
+.button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.success {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 5px;
+}
+
+.success pre {
+  margin: 0.5rem 0 0;
+  overflow-x: auto;
+  background-color: #fff;
+  padding: 1rem;
+  border-radius: 3px;
+}
+
+.error {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 5px;
+}
+
+.note {
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: #d1ecf1;
+  border: 1px solid #bee5eb;
+  border-radius: 5px;
+  font-weight: 500;
+}
+
+table {
+  margin: 1rem auto;
+  border-collapse: collapse;
+}
+
+table td {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+}
+
+ul {
+  text-align: left;
+  max-width: 500px;
+  margin: 1rem auto;
+}
+
+h2 {
+  margin-top: 2rem;
+  font-size: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 2rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
