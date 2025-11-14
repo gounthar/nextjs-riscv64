@@ -414,6 +414,7 @@ Links:
 - Issue #2: Native Dependencies Audit
 - Issue #3: Prebuilt Binaries Strategy
 - PR #8: Babel Fallback Solution
+- Issue #9: ring crate compilation failure on riscv64
 
 ## Actual Build Experience (2025-11-14)
 
@@ -456,10 +457,14 @@ pnpm install --ignore-scripts
 Note: turbo package doesn't support riscv64 (expected), but this doesn't affect SWC build.
 
 6. **Build with Cargo** 🔄 (2-4 hours estimated)
+
+⚠️ **Important**: Build fails with default features due to `ring v0.16.20` not supporting riscv64. See [Issue #9](https://github.com/gounthar/nextjs-riscv64/issues/9) for details.
+
+**Working command** (without default features):
 ```bash
 cd ~/next.js/packages/next-swc
 source "$HOME/.cargo/env"
-cargo build --release --manifest-path crates/napi/Cargo.toml
+cargo build --release --manifest-path crates/napi/Cargo.toml --no-default-features
 ```
 
 ### Key Findings
@@ -467,9 +472,10 @@ cargo build --release --manifest-path crates/napi/Cargo.toml
 - ✅ All prerequisites install smoothly on riscv64
 - ✅ Rust nightly-2023-10-06 is required (specified in rust-toolchain file)
 - ⚠️ `pnpm build-native` fails due to missing @napi-rs/cli
-- ✅ Direct cargo build works: `cargo build --release --manifest-path crates/napi/Cargo.toml`
+- ❌ Default cargo build fails on `ring v0.16.20` (cryptography library, no riscv64 support)
+- ✅ Build succeeds with `--no-default-features` flag (skips TLS dependencies)
 - ⏱️ Dependency fetching phase: ~10-20 minutes
-- ⏱️ Total build time: 2-4 hours (ongoing)
+- ⏱️ Total build time: 2-4 hours
 
 ### Recommended Build Command
 
@@ -477,13 +483,19 @@ cargo build --release --manifest-path crates/napi/Cargo.toml
 # Navigate to next-swc package
 cd ~/next.js/packages/next-swc
 
-# Build with cargo directly
+# Build with cargo directly (without default features to avoid ring dependency)
 source "$HOME/.cargo/env"
-cargo build --release --manifest-path crates/napi/Cargo.toml
+cargo build --release --manifest-path crates/napi/Cargo.toml --no-default-features
 
 # Output location
 # target/release/libnext_swc_napi.so (needs to be renamed to .node)
 ```
+
+**Why `--no-default-features`?**
+- Default features include `rustls-tls` which requires `ring v0.16.20`
+- `ring` doesn't support riscv64 architecture in this version
+- TLS features are not needed for local Next.js compilation
+- See [Issue #9](https://github.com/gounthar/nextjs-riscv64/issues/9) for long-term solutions
 
 ## Updates
 
