@@ -177,16 +177,34 @@ Route (pages)                              Size     First Load JS
 - Memory usage: Acceptable on 8-core riscv64
 - Page generation: 0.76-1.12 seconds per page
 
-### App Router with Babel Fallback
+### App Router with Babel Fallback ❌ BLOCKED
 
-Status: **To be tested**
+**Status**: **NOT WORKING** (Tested 2025-11-14 on Banana Pi F3)
 
-- [ ] React Server Components work
-- [ ] Client Components function
-- [ ] Static rendering works
-- [ ] Dynamic rendering works
-- [ ] Route Handlers work
-- [ ] Build time acceptable
+**Configuration**:
+- Next.js: 13.5.6
+- Node.js: v24.11.1
+- `.babelrc` with `next/babel` preset
+- `swcMinify: false` in next.config.js
+
+**Issue**: SWC WASM fallback crashes during App Router compilation
+
+**Error**:
+```
+panicked at swc_ecma_codegen-0.145.5/src/lib.rs:2476:30:
+index out of bounds: the len is 1 but the index is 1
+RuntimeError: unreachable
+```
+
+**Root Cause**: Bug in `@next/swc-wasm-nodejs` codegen when processing App Router code. The WASM fallback doesn't fully support App Router syntax patterns.
+
+**Test Results**:
+- ❌ Build fails with panic in SWC WASM codegen
+- ❌ Cannot generate production bundle
+- ⚠️ Issue is in Next.js 13.5.6's SWC WASM fallback, not Babel
+- ⚠️ Would work with native SWC binary
+
+**Workaround**: Use Pages Router instead (fully working), or build native SWC from source
 
 ## Recommendations
 
