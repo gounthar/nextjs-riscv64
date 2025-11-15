@@ -249,6 +249,29 @@ Use **Babel fallback with Next.js 13.5.6** - Tested and working!
 - Must build SWC from source
 - No fallback option available
 
+### Versioning Strategy
+
+When using Next.js 13.5.6 with the Babel fallback workaround, consider your use case:
+
+**For Experimental Testing** (Current approach):
+```json
+"next": "13.5.6"
+```
+- Pins to exact version for reproducible test results
+- Ensures consistency across test environments
+- Best for validation and benchmarking
+
+**For Production Use** (Recommended):
+```json
+"next": "~13.5.6"
+```
+- Allows patch updates (13.5.7, 13.5.8, etc.)
+- Receives security patches and bug fixes automatically
+- Prevents minor/major version bumps that could break compatibility
+- Follows semantic versioning best practices
+
+The tilde (`~`) operator allows only patch-level updates within the 13.5.x range, maintaining compatibility while getting important updates.
+
 ## Related Issues
 
 - Issue #1: Runtime Testing
