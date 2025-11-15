@@ -22,6 +22,30 @@ This is a test application for validating Next.js App Router on riscv64 architec
 - ✅ API Routes (Route Handlers)
 - ✅ TypeScript support
 
+## Version Pinning Strategy
+
+This test application uses an **exact version pin** for Next.js (`13.5.6`) rather than a semver range (e.g., `~13.5.6` or `^13.5.6`). This is intentional and serves different purposes depending on the use case:
+
+### For Experimental Testing (Current Approach)
+- **Version**: `"next": "13.5.6"` (exact pin)
+- **Purpose**: Ensures reproducibility of test results across different environments and time periods
+- **Benefits**: 
+  - Consistent behavior when debugging issues
+  - Reliable comparisons between test runs
+  - Clear documentation of tested configurations
+- **Use When**: Running experiments, validating workarounds, or documenting specific behaviors
+
+### For Production Use (Recommended)
+- **Version**: `"next": "~13.5.6"` (tilde range)
+- **Purpose**: Allows automatic patch updates (e.g., 13.5.7, 13.5.8) while preventing minor version changes
+- **Benefits**:
+  - Automatic security patches
+  - Bug fixes without manual updates
+  - Still maintains API compatibility (no breaking changes)
+- **Use When**: Deploying to production, maintaining applications over time
+
+**Note**: The tilde (`~`) constraint allows patch-level updates only. For example, `~13.5.6` matches `13.5.6`, `13.5.7`, `13.5.99`, but not `13.6.0` or `14.0.0`.
+
 ## Setup
 
 ### 1. Install Node.js riscv64
