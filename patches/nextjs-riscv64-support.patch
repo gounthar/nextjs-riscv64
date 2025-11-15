@@ -1,0 +1,10 @@
+--- a/node_modules/next/dist/build/swc/index.js
++++ b/node_modules/next/dist/build/swc/index.js
+@@ -159,6 +159,7 @@ const getSupportedArchTriples = ()=>{
+             // linux[x64] includes `gnux32` abi, with x64 arch.
+             x64: linux.x64.filter((triple)=>triple.abi !== "gnux32"),
+             arm64: linux.arm64,
++            riscv64: linux.riscv64gc,
+             // This target is being deprecated, however we keep it in `knownDefaultWasmFallbackTriples` for now
+             arm: linux.arm
+         },
