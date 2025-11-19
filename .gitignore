@@ -42,7 +42,10 @@ logs/
 # Local configuration
 CLAUDE.md
 CONTEXT.md
+NEXT-SESSION.md
 .claude/
+.bridge-config
+.last_article_timestamp
 
 # Temporary files
 tmp/

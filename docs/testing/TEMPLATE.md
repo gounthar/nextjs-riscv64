@@ -1,0 +1,224 @@
+# Next.js Test Report - riscv64
+
+**Date**: YYYY-MM-DD HH:MM:SS
+**Test Application**: [pages-router / app-router]
+**Tester**: [Your name]
+**Issue**: #1
+
+## System Information
+
+- **Hardware**: Banana Pi F3
+- **Architecture**: riscv64
+- **OS**: Debian 13 (Trixie)
+- **Kernel**: [uname -r]
+- **Node.js Version**: [node --version]
+- **npm Version**: [npm --version]
+- **Next.js Version**: 14.2.0
+- **React Version**: 18.3.0
+
+## Test Environment
+
+```bash
+# Architecture
+$ uname -m
+riscv64
+
+# Node.js info
+$ node --version
+v24.11.1
+
+# System info
+$ cat /proc/cpuinfo | grep processor | wc -l
+8
+
+$ free -h
+              total        used        free      shared  buff/cache   available
+Mem:           15Gi       2.0Gi        11Gi       100Mi       2.5Gi        13Gi
+Swap:         2.0Gi          0B       2.0Gi
+```
+
+## Test Results
+
+### 1. Dependency Installation
+
+**Command**: `npm install`
+
+- ✅/❌ Status: [Success / Failed]
+- ⏱️ Duration: ___ seconds
+- 📦 node_modules size: ___ MB
+- 📝 Notes: [Any warnings or issues]
+
+<details>
+<summary>Installation Log</summary>
+
+```
+[Paste relevant npm install output here]
+```
+
+</details>
+
+### 2. Development Mode
+
+**Command**: `npm run dev`
+
+- ✅/❌ Status: [Success / Failed]
+- ⏱️ Startup Time: ___ seconds
+- 🌐 Accessibility: [http://localhost:3000 accessible]
+- 🔥 Hot Reload: [Working / Not Working]
+- 📝 Notes: [Any issues or observations]
+
+**Features Tested**:
+- [ ] Home page renders
+- [ ] Client-side navigation works
+- [ ] Hot Module Replacement (HMR)
+- [ ] Fast Refresh
+- [ ] Error overlay
+
+<details>
+<summary>Development Server Log</summary>
+
+```
+[Paste relevant dev server output here]
+```
+
+</details>
+
+### 3. Production Build
+
+**Command**: `npm run build`
+
+- ✅/❌ Status: [Success / Failed]
+- ⏱️ Build Duration: ___ minutes ___ seconds
+- 📦 Build Output Size: ___ MB
+- 📝 Notes: [Build warnings, optimization info]
+
+**Build Output**:
+```
+[Paste build output summary here]
+```
+
+**Static Pages Generated**:
+- [ ] `/` (home)
+- [ ] `/about`
+- [ ] `/ssg`
+- [ ] Other: ___
+
+<details>
+<summary>Full Build Log</summary>
+
+```
+[Paste complete build output here if there are errors]
+```
+
+</details>
+
+### 4. Production Server
+
+**Command**: `npm run start`
+
+- ✅/❌ Status: [Success / Failed]
+- ⏱️ Startup Time: ___ seconds
+- 🌐 Server Running: [Yes / No]
+- 📝 Notes: [Any issues]
+
+**Endpoints Tested**:
+
+| Endpoint | HTTP Code | Response Time | Status | Notes |
+|----------|-----------|---------------|--------|-------|
+| `/` | ___ | ___ ms | ✅/❌ | |
+| `/about` | ___ | ___ ms | ✅/❌ | |
+| `/ssg` | ___ | ___ ms | ✅/❌ | |
+| `/ssr` | ___ | ___ ms | ✅/❌ | |
+| `/api/test` | ___ | ___ ms | ✅/❌ | |
+
+### 5. Feature Testing
+
+#### Static Site Generation (SSG)
+- ✅/❌ Status: [Working / Not Working]
+- 📝 Notes: [Observations]
+
+#### Server-Side Rendering (SSR)
+- ✅/❌ Status: [Working / Not Working]
+- 📝 Notes: [Observations]
+
+#### API Routes
+- ✅/❌ Status: [Working / Not Working]
+- 📝 Response format: [Valid JSON / Errors]
+- 📝 Notes: [Observations]
+
+#### Client-Side Features
+- ✅/❌ Interactive buttons: [Working / Not Working]
+- ✅/❌ Client-side routing: [Working / Not Working]
+- ✅/❌ API calls from client: [Working / Not Working]
+
+## Performance Metrics
+
+### Build Performance
+- **Total Build Time**: ___ minutes ___ seconds
+- **CPU Usage**: [Average % during build]
+- **Memory Usage**: [Peak memory used]
+- **Temperature**: [If available]
+
+### Runtime Performance
+- **Cold Start (Dev)**: ___ seconds
+- **Cold Start (Prod)**: ___ seconds
+- **Hot Reload Time**: ___ seconds
+- **Average Response Time (Static)**: ___ ms
+- **Average Response Time (Dynamic)**: ___ ms
+- **API Response Time**: ___ ms
+
+## Issues Encountered
+
+### Critical Issues
+1. **Issue**: [Description]
+   - **Impact**: [High / Medium / Low]
+   - **Workaround**: [If any]
+
+### Warnings
+1. **Warning**: [Description]
+   - **Impact**: [Informational / Minor]
+
+### Minor Issues
+1. **Issue**: [Description]
+
+## Comparison with x64
+
+[If you have x64 benchmark data, compare here]
+
+| Metric | riscv64 | x64 | Difference |
+|--------|---------|-----|------------|
+| Build Time | ___ s | ___ s | +___% |
+| Dev Startup | ___ s | ___ s | +___% |
+| Response Time | ___ ms | ___ ms | +___% |
+
+## Native Dependencies
+
+List any native modules detected:
+
+- `@next/swc-linux-riscv64-gnu`: [Found / Not Found / Fallback used]
+- `sharp`: [Installed / Failed / Not tested]
+- Other: ___
+
+## Conclusion
+
+**Overall Status**: ✅ Success / ⚠️ Partial Success / ❌ Failed
+
+**Summary**:
+[Brief summary of test results - what works, what doesn't]
+
+**Recommendations**:
+1. [Recommendation 1]
+2. [Recommendation 2]
+
+**Next Steps**:
+- [ ] Action item 1
+- [ ] Action item 2
+
+## Additional Notes
+
+[Any other relevant information, observations, or context]
+
+---
+
+**Test completed**: YYYY-MM-DD HH:MM:SS
+**Report generated by**: [Your name]
