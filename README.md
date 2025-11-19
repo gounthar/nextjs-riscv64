@@ -83,28 +83,34 @@ This maps Node.js's `riscv64` arch to the `riscv64gc` key in `@napi-rs/triples`.
 
 ## Documentation
 
-- **[Building SWC](docs/BUILDING-SWC.md)** - Complete guide to building @next/swc from source
-- **[SWC Workarounds](docs/SWC-WORKAROUNDS.md)** - All approaches including Babel fallback
-- **[Patches](patches/README.md)** - Loader patch documentation and installer
+- **[Installation Guide](docs/INSTALLATION.md)** - Complete installation instructions for all methods
+- **[Building SWC](docs/BUILDING-SWC.md)** - Build @next/swc from source
+- **[SWC Workarounds](docs/SWC-WORKAROUNDS.md)** - Babel fallback and alternatives
+- **[Prebuilt Binaries Strategy](docs/PREBUILT-BINARIES-STRATEGY.md)** - Distribution and hosting plans
+- **[Patches](patches/README.md)** - Loader patch documentation
 
 ## Repository Structure
 
 ```
 nextjs-riscv64/
 ├── docs/
-│   ├── BUILDING-SWC.md      # SWC build guide
-│   └── SWC-WORKAROUNDS.md   # All workaround approaches
+│   ├── INSTALLATION.md                # Complete installation guide
+│   ├── BUILDING-SWC.md                # SWC build guide
+│   ├── SWC-WORKAROUNDS.md             # Babel fallback & alternatives
+│   └── PREBUILT-BINARIES-STRATEGY.md  # Distribution strategy
 ├── patches/
-│   ├── apply-nextjs-patch.sh           # Automated installer
-│   ├── nextjs-riscv64-support.patch    # The patch file
-│   └── README.md                        # Patch documentation
+│   ├── apply-nextjs-patch.sh          # Automated patch installer
+│   ├── nextjs-riscv64-support.patch   # The patch file
+│   └── README.md                      # Patch documentation
 ├── scripts/
-│   ├── install-nodejs.sh    # Node.js installer for riscv64
-│   └── run-tests.sh         # Automated test runner
+│   ├── install-nodejs.sh              # Node.js installer
+│   ├── build-native-swc.sh            # Build SWC from source
+│   ├── install-riscv64-binaries.sh    # Install prebuilt binaries
+│   └── run-tests.sh                   # Automated test runner
 ├── tests/
-│   ├── pages-router/        # Pages Router test app
-│   └── app-router/          # App Router test app
-└── journal/                 # Session documentation
+│   ├── pages-router/                  # Pages Router test app
+│   └── app-router/                    # App Router test app
+└── journal/                           # Session documentation
 ```
 
 ## Background
