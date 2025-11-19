@@ -313,6 +313,47 @@ Route (pages)                              Size     First Load JS
 
 **Key Achievement**: First successful Next.js build on riscv64 using native SWC binaries!
 
+### App Router with Native SWC (Loader Patch) ✅ SUCCESS
+
+**Status**: **WORKING** (Tested 2025-11-15 on Banana Pi F3)
+
+**Configuration**:
+- Next.js: 13.5.6
+- Node.js: v24.11.1
+- Loader patch applied
+- Native SWC binaries: `@next/swc-linux-riscv64gc-gnu` (220MB)
+- No `.babelrc` (using native SWC only)
+
+**Test Results**:
+- ✅ No "unsupported platform" warnings
+- ✅ Native SWC binaries loaded successfully
+- ✅ Production build succeeds
+- ✅ All static pages generate correctly
+- ✅ SSR pages work
+- ✅ API routes function
+- ✅ Full SWC performance
+- ✅ TypeScript compilation works
+
+**Build Output**:
+```
+✓ Compiled successfully
+✓ Generating static pages (9/9)
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    193 B          86.6 kB
+├ ○ /_not-found                          889 B          80.5 kB
+├ ○ /about                               193 B          86.6 kB
+├ ○ /api-test                            1.06 kB        87.5 kB
+├ ○ /api/test                            0 B                0 B
+├ ○ /ssg                                 193 B          86.6 kB
+└ λ /ssr                                 193 B          86.6 kB
++ First Load JS shared by all            79.6 kB
+```
+
+**Key Finding**: The App Router issue was **NOT** in native SWC - it was only in the WASM fallback!
+
+With native SWC + loader patch, App Router works perfectly. This means both Next.js routing modes are fully functional on riscv64.
+
 ### App Router with Babel Fallback ❌ BLOCKED
 
 **Status**: **NOT WORKING** (Tested 2025-11-14 on Banana Pi F3)
@@ -414,7 +455,9 @@ RuntimeError: unreachable
 
 ## Updates
 
-- **2025-11-15**: ✅ **Successfully patched Next.js loader for riscv64 support**
+- **2025-11-15**: ✅ **App Router also works with native SWC + loader patch!**
+- **2025-11-15**: Both Pages Router and App Router fully functional on riscv64
+- **2025-11-15**: ✅ Successfully patched Next.js loader for riscv64 support
 - **2025-11-15**: Created automated patch installer (`patches/apply-nextjs-patch.sh`)
 - **2025-11-15**: First successful Next.js build using native SWC on riscv64!
 - **2025-11-15**: Tested and validated loader patch on Banana Pi F3
