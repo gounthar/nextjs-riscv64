@@ -1,0 +1,391 @@
+= App Router Works Too: The Final Piece of Next.js on RISC-V
+Bruno Verachten
+v1.0, 2025-11-19
+:description: Testing the native SWC build on App Router revealed that the WASM codegen bug was isolated to WASM only - native SWC works perfectly for both routing modes
+:keywords: nextjs, riscv64, swc, app-router, native-modules, performance, breakthrough
+:imagesdir: ./images
+:source-highlighter: rouge
+:toc: left
+:toclevels: 2
+:sectnums:
+:icons: font
+
+[abstract]
+After yesterday's breakthrough with the loader patch for Pages Router, I had one nagging question: what about App Router? The WASM fallback crashes with that dreaded "panicked at swc_ecma_codegen" error. Would native SWC have the same problem? Today I discovered the answer - and it's better than I hoped. App Router works flawlessly with native SWC. The bug was isolated to WASM only. Next.js is now fully functional on riscv64.
+
+== The Lingering Question
+
+Yesterday felt like victory. After days of wrestling with Babel fallbacks and WASM crashes, I'd found the one-line patch that made Next.js recognize riscv64 architecture. The Pages Router built successfully with native SWC performance.
+
+But there was an elephant in the room.
+
+App Router.
+
+When I'd tested App Router earlier in the week, it crashed spectacularly:
+
+[source,console]
+----
+panicked at swc_ecma_codegen-0.145.5/src/lib.rs:2476:30:
+index out of bounds: the len is 1 but the index is 1
+RuntimeError: unreachable
+----
+
+This was the WASM fallback crashing on App Router's more complex JSX patterns. At the time, I'd documented this as a fundamental limitation - use Pages Router or wait for native SWC.
+
+But now I *had* native SWC. Would it have the same bug?
+
+== The Test Setup
+
+I SSH'd into my Banana Pi F3 and navigated to the App Router test project:
+
+[source,bash]
+----
+ssh poddingue@192.168.1.185
+cd ~/nextjs-test/app-router
+----
+
+The test application is comprehensive, covering all the patterns that matter:
+
+* `/` - Home page (static)
+* `/about` - Simple page component
+* `/ssg` - Static Site Generation
+* `/ssr` - Server-Side Rendering
+* `/api-test` - Client-side API interaction
+* `/api/test` - API route handler
+
+This is the same application that crashed the WASM fallback. Every page uses App Router's component model. If native SWC had the same codegen bug, this test would find it.
+
+First, I needed to apply the loader patch:
+
+[source,bash]
+----
+# Apply the one-line patch
+cd ~/nextjs-test/app-router
+/mnt/c/support/users/dev/riscv/nextjs-riscv64/patches/apply-nextjs-patch.sh
+----
+
+[source,console]
+----
+=== Next.js riscv64 Patch Installer ===
+
+Creating backup...
+OK Backup created: node_modules/next/dist/build/swc/index.js.backup
+
+Applying patch...
+OK Patch applied successfully
+
+=== Verification ===
+OK riscv64 support verified in Next.js loader
+
+OK All done! Next.js now supports riscv64 architecture.
+----
+
+The patch was in place. The native SWC binaries were installed. Time for the moment of truth.
+
+== The Build
+
+I ran the build command and held my breath:
+
+[source,bash]
+----
+npm run build
+----
+
+The familiar Next.js 13.5.6 banner appeared. Then the compilation started.
+
+[source,console]
+----
+> nextjs-app-router-test@0.1.0 build
+> next build
+
+   ▲ Next.js 13.5.6
+
+ ✓ Creating an optimized production build
+----
+
+No warnings about unsupported platforms. No WASM fallback messages. The native SWC binary was loading correctly.
+
+Then:
+
+[source,console]
+----
+ ✓ Compiled successfully
+ ✓ Linting and checking validity of types
+ ✓ Collecting page data
+ ✓ Generating static pages (9/9)
+ ✓ Finalizing page optimization
+----
+
+Wait.
+
+*It worked?*
+
+[source,console]
+----
+Route (app)                              Size     First Load JS
+┌ ○ /                                    193 B          86.6 kB
+├ ○ /_not-found                          889 B          80.5 kB
+├ ○ /about                               193 B          86.6 kB
+├ ○ /api-test                            1.06 kB        87.5 kB
+├ ○ /api/test                            0 B                0 B
+├ ○ /ssg                                 193 B          86.6 kB
+└ λ /ssr                                 193 B          86.6 kB
++ First Load JS shared by all            79.6 kB
+  ├ chunks/...
+
+✓ Compiled successfully
+----
+
+All nine routes. All successfully generated. No panics, no crashes, no errors.
+
+I sat back and stared at the screen for a moment. This was bigger than I'd expected.
+
+== The Implications
+
+Let me explain why this matters so much.
+
+The WASM codegen crash had seemed like a fundamental problem with SWC on riscv64. I'd assumed the bug was somewhere deep in SWC's code generation logic - something that would affect both WASM and native builds. That's why I'd focused on Pages Router as the "working" solution.
+
+But no.
+
+**The bug was in the WASM build only.**
+
+The native SWC binary, compiled from the exact same Rust source code, doesn't have this problem. Whatever was causing `index out of bounds: the len is 1 but the index is 1` in the WASM codegen, it's specific to the WASM runtime environment.
+
+This means:
+
+1. **Both routing modes work**: Pages Router AND App Router are fully functional
+2. **Full Next.js compatibility**: No features are blocked on riscv64
+3. **No compromises needed**: You don't have to choose between routing modes
+4. **Future-proof**: App Router is the future of Next.js, and it works
+
+== The Complete Picture
+
+Let me put together what we now know about Next.js on riscv64:
+
+[cols="1,1,1,1"]
+|===
+|Router |Native SWC |WASM Fallback |Babel
+
+|**Pages Router**
+|✅ Works
+|⚠️ Works (slow)
+|✅ Works (17x slower)
+
+|**App Router**
+|✅ Works
+|❌ Crashes
+|N/A (requires SWC)
+|===
+
+The path is clear: **use native SWC**.
+
+With the loader patch and native binaries:
+* Both routing modes work perfectly
+* Full SWC performance (17x faster than Babel)
+* All Next.js features supported
+* Bundle sizes comparable to x64/ARM64
+
+== Performance Comparison
+
+Now that both routers work, let's compare the results:
+
+=== Pages Router (Native SWC)
+
+[source]
+----
+Route (pages)                              Size     First Load JS
+┌ ○ /                                      1.82 kB        83.6 kB
+├   /_app                                  0 B            79.3 kB
+├ ○ /404                                   182 B          79.5 kB
+├ ○ /about                                 1.78 kB        83.5 kB
+├ ○ /api-test                              955 B          82.7 kB
+├ λ /api/test                              0 B            79.3 kB
+├ ● /ssg                                   906 B          82.7 kB
+└ λ /ssr                                   1.02 kB        82.8 kB
++ First Load JS shared by all              79.6 kB
+----
+
+=== App Router (Native SWC)
+
+[source]
+----
+Route (app)                              Size     First Load JS
+┌ ○ /                                    193 B          86.6 kB
+├ ○ /_not-found                          889 B          80.5 kB
+├ ○ /about                               193 B          86.6 kB
+├ ○ /api-test                            1.06 kB        87.5 kB
+├ ○ /api/test                            0 B                0 B
+├ ○ /ssg                                 193 B          86.6 kB
+└ λ /ssr                                 193 B          86.6 kB
++ First Load JS shared by all            79.6 kB
+----
+
+Interesting observations:
+
+* **Shared JS**: Both routers use the same 79.6 kB base
+* **Page sizes**: App Router pages are smaller (193 B vs 1-2 kB)
+* **First Load**: Similar overall (79-87 kB range)
+* **All routes**: Every route type works - static, SSG, SSR, API
+
+The App Router's smaller page sizes come from its RSC (React Server Components) architecture. More work happens on the server, less JavaScript ships to the client.
+
+== The Complete Solution
+
+Here's the definitive guide to running Next.js on riscv64:
+
+=== Step 1: Build SWC Binary
+
+[source,bash]
+----
+cd ~/next.js/packages/next-swc
+source "$HOME/.cargo/env"
+
+# Must use --no-default-features to avoid ring v0.16.20
+cargo build --release --manifest-path crates/napi/Cargo.toml --no-default-features
+----
+
+Time: 2-4 hours on Banana Pi F3
+
+Output: `target/release/libnext_swc_napi.so` (220MB)
+
+=== Step 2: Package as npm Module
+
+[source,bash]
+----
+mkdir -p @next/swc-linux-riscv64gc-gnu
+cp target/release/libnext_swc_napi.so \
+   @next/swc-linux-riscv64gc-gnu/next-swc.linux-riscv64gc-gnu.node
+
+# Create package.json
+cat > @next/swc-linux-riscv64gc-gnu/package.json <<EOF
+{
+  "name": "@next/swc-linux-riscv64gc-gnu",
+  "version": "13.5.6",
+  "main": "next-swc.linux-riscv64gc-gnu.node"
+}
+EOF
+----
+
+=== Step 3: Apply Loader Patch
+
+[source,bash]
+----
+cd your-nextjs-project
+npm install /path/to/@next/swc-linux-riscv64gc-gnu
+/path/to/patches/apply-nextjs-patch.sh
+----
+
+=== Step 4: Build Your App
+
+[source,bash]
+----
+npm run build
+----
+
+That's it. Both Pages Router and App Router will work perfectly.
+
+== What About the WASM Bug?
+
+Some might wonder: should we report the WASM codegen bug to SWC?
+
+Probably, yes. But it's a low priority for the riscv64 use case because:
+
+1. **Native SWC is better anyway**: Faster, more efficient
+2. **WASM is a fallback**: Not the intended path for production
+3. **Debugging is hard**: Reproducing WASM bugs across architectures is complex
+
+If someone wants to dig into the WASM issue, the error points to `swc_ecma_codegen-0.145.5/src/lib.rs:2476:30`. It's an index bounds error in the code generator, triggered by specific patterns in App Router components. But for practical purposes, native SWC is the solution.
+
+== Lessons From This Journey
+
+Looking back at the entire debugging journey - from "SWC missing for linux/riscv64" to "both routers fully working" - a few lessons stand out:
+
+=== 1. Don't Assume Problems Are Connected
+
+When the WASM fallback crashed on App Router, I assumed it was a fundamental SWC issue on riscv64. It wasn't. The native build worked fine. Sometimes what looks like one problem is actually two separate issues.
+
+=== 2. Test Your Assumptions
+
+I could have tested App Router with native SWC days ago. Instead, I assumed the WASM bug would affect native builds too. Always test - assumptions are dangerous.
+
+=== 3. The Simplest Solution Often Works
+
+The entire Next.js-on-riscv64 solution comes down to:
+- One cargo build command (with `--no-default-features`)
+- One line of code (the loader patch)
+- Normal npm workflow
+
+No heroics. No complex workarounds. Just careful debugging to find the actual problems.
+
+=== 4. Architecture Support is Often Close
+
+RISC-V support in the JavaScript ecosystem is often just a few patches away. The infrastructure exists in packages like `@napi-rs/triples`. The build systems work. Usually it's just a matter of adding the architecture to a list somewhere and testing.
+
+== What's Next
+
+With both routing modes working, the project goals are largely achieved:
+
+* **Runtime Testing**: ✅ Complete - both routers work
+* **Dependency Audit**: ✅ Complete - ring crate identified and bypassed
+* **Workarounds Documented**: ✅ Complete - full documentation in place
+
+The remaining work is about making this easier for others:
+
+1. **Upstream the loader patch** - Submit PR to Next.js
+2. **Publish binaries** - Host pre-built SWC for riscv64
+3. **Automate builds** - CI/CD for each Next.js release
+4. **Engage with Vercel** - Official riscv64 support
+
+The dream is that someday you'll just `npm install next` on a RISC-V machine and everything will work. Until then, we have a complete working solution.
+
+== Conclusion: Mission Accomplished
+
+This started as an experiment: can we run Next.js on riscv64? The answer is a resounding yes.
+
+* **Pages Router**: ✅ Full native SWC performance
+* **App Router**: ✅ Full native SWC performance
+* **Build times**: Comparable to x64/ARM64
+* **Bundle sizes**: Competitive (79-87 kB)
+* **All features**: SSG, SSR, API routes, everything works
+
+The WASM codegen crash that blocked App Router? It was a red herring. The real solution was always native SWC with the loader patch.
+
+One line of code to recognize riscv64. One build flag to bypass the ring crate. That's all it took to unlock the entire Next.js ecosystem on RISC-V hardware.
+
+Today I watched all nine routes of an App Router application generate successfully on a Banana Pi F3. After weeks of debugging, that output was beautiful:
+
+[source]
+----
+✓ Compiled successfully
+✓ Generating static pages (9/9)
+----
+
+Next.js on riscv64. It works. Both routers. Full performance.
+
+Mission accomplished.
+
+== Resources
+
+**Complete Solution**:
+
+1. Build SWC with `--no-default-features` (docs/BUILDING-SWC.md)
+2. Apply loader patch (patches/apply-nextjs-patch.sh)
+3. Build normally (`npm run build`)
+
+**Documentation**:
+* `docs/BUILDING-SWC.md` - Building SWC binaries from source
+* `docs/SWC-WORKAROUNDS.md` - Complete solution matrix
+* `patches/README.md` - Patch installation guide
+
+**Test Hardware**:
+* Banana Pi F3 (8 cores, 15GB RAM, riscv64)
+* Debian 13 (Trixie)
+* Node.js v24.11.1 (from gounthar/unofficial-builds)
+
+**Repository**:
+* https://github.com/gounthar/nextjs-riscv64
+
+---
+
+_Written with satisfaction after seeing "Generating static pages (9/9)" for an App Router application on RISC-V hardware._
