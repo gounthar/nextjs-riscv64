@@ -93,7 +93,8 @@ cd packages/next-swc
 ### Step 4: Build Native Binary
 
 \`\`\`bash
-pnpm build-native
+source "$HOME/.cargo/env"
+cargo build --release --manifest-path crates/napi/Cargo.toml --no-default-features
 \`\`\`
 
 **⏱️ Expected Time**:
@@ -115,7 +116,7 @@ find . -name "*.node" -type f
 
 Expected location:
 \`\`\`
-./native/next-swc.linux-riscv64-gnu.node
+./target/release/next-swc.linux-riscv64-gnu.node
 \`\`\`
 
 ## Installation
@@ -147,7 +148,7 @@ cat > package.json <<EOF
 EOF
 
 # Copy built binary
-cp ~/next.js/packages/next-swc/native/next-swc.linux-riscv64-gnu.node .
+cp ~/next.js/packages/next-swc/target/release/next-swc.linux-riscv64-gnu.node .
 
 # Publish locally or to npm
 npm link
@@ -164,7 +165,7 @@ cd /path/to/your/nextjs-project
 mkdir -p node_modules/@next/swc-linux-riscv64-gnu
 
 # Copy binary
-cp ~/next.js/packages/next-swc/native/next-swc.linux-riscv64-gnu.node \\
+cp ~/next.js/packages/next-swc/target/release/next-swc.linux-riscv64-gnu.node \\
    node_modules/@next/swc-linux-riscv64-gnu/next-swc.linux-riscv64-gnu.node
 
 # Create package.json
@@ -309,11 +310,12 @@ git checkout "$NEXT_VERSION"
 
 # Build
 cd packages/next-swc
-pnpm build-native
+source "$HOME/.cargo/env"
+cargo build --release --manifest-path crates/napi/Cargo.toml --no-default-features
 
 # Package
 mkdir -p "$OUTPUT_DIR"
-cp native/*.node "$OUTPUT_DIR/"
+cp target/release/*.node "$OUTPUT_DIR/"
 
 echo "Build complete: $OUTPUT_DIR"
 \`\`\`
