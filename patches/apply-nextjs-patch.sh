@@ -58,6 +58,8 @@ if grep -q "riscv64: linux.riscv64gc" "$NEXTJS_SWC_FILE"; then
     echo "✅ riscv64 support verified in Next.js loader"
 else
     echo "❌ Patch verification failed!"
+    echo "Restoring backup..."
+    mv "${NEXTJS_SWC_FILE}.backup" "$NEXTJS_SWC_FILE"
     exit 1
 fi
 
