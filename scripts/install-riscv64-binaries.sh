@@ -201,7 +201,7 @@ apply_patch() {
 
     # Apply patch: add riscv64 to platform detection
     # This maps Node.js 'riscv64' arch to @napi-rs/triples 'riscv64gc' key
-    local patch_file="$(dirname "$0")/../patches/nextjs-riscv64-support.patch"
+    local patch_file="$(dirname "${BASH_SOURCE[0]}")/../patches/nextjs-riscv64-support.patch"
     if [ ! -f "${patch_file}" ]; then
         log_error "Patch file not found: ${patch_file}"
         exit 1
