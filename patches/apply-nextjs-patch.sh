@@ -36,7 +36,7 @@ if grep -q "riscv64: linux.riscv64gc" "$NEXTJS_SWC_FILE"; then
     echo "⚠️  Patch already applied!"
 else
     # Add riscv64 support using unified diff patch
-    PATCH_FILE="$(dirname "$0")/nextjs-riscv64-support.patch"
+    PATCH_FILE="$(dirname "${BASH_SOURCE[0]}")/nextjs-riscv64-support.patch"
     if [ ! -f "$PATCH_FILE" ]; then
         echo "❌ Patch file not found: $PATCH_FILE"
         exit 1
@@ -46,6 +46,8 @@ else
         echo "✅ Patch applied successfully"
     else
         echo "❌ Failed to apply patch"
+        echo "Restoring backup..."
+        mv "${NEXTJS_SWC_FILE}.backup" "$NEXTJS_SWC_FILE"
         exit 1
     fi
 fi

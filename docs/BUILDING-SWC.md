@@ -116,7 +116,7 @@ find . -name "*.node" -type f
 
 Expected location:
 \`\`\`
-./native/next-swc.linux-riscv64-gnu.node
+./target/release/next-swc.linux-riscv64-gnu.node
 \`\`\`
 
 ## Installation
@@ -148,7 +148,7 @@ cat > package.json <<EOF
 EOF
 
 # Copy built binary
-cp ~/next.js/packages/next-swc/native/next-swc.linux-riscv64-gnu.node .
+cp ~/next.js/packages/next-swc/target/release/next-swc.linux-riscv64-gnu.node .
 
 # Publish locally or to npm
 npm link
@@ -165,7 +165,7 @@ cd /path/to/your/nextjs-project
 mkdir -p node_modules/@next/swc-linux-riscv64-gnu
 
 # Copy binary
-cp ~/next.js/packages/next-swc/native/next-swc.linux-riscv64-gnu.node \\
+cp ~/next.js/packages/next-swc/target/release/next-swc.linux-riscv64-gnu.node \\
    node_modules/@next/swc-linux-riscv64-gnu/next-swc.linux-riscv64-gnu.node
 
 # Create package.json
