@@ -41,10 +41,10 @@ function setup() {
     version: '1.0.0',
     private: true,
     dependencies: {
-      '@prisma/client': '^7.0.0'
+      '@prisma/client': '^6.16.0'
     },
     devDependencies: {
-      'prisma': '^7.0.0'
+      'prisma': '^6.16.0'
     }
   };
   fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2));
