@@ -2,20 +2,22 @@
 
 This document provides a comprehensive audit of native Node.js modules commonly used in the Next.js ecosystem, analyzing their riscv64 support status and build requirements.
 
-**Last Updated**: 2025-11-19
+**Last Updated**: 2025-11-20 (hardware tested on Banana Pi F3)
 
 ## Executive Summary
 
-Out of 20+ native modules analyzed, only **3 provide official riscv64 prebuilt binaries**. Most modules require building from source on riscv64, with varying degrees of difficulty. The good news: all critical modules CAN be built from source with appropriate tooling.
+Out of 20+ native modules analyzed, only **3 provide official riscv64 prebuilt binaries**. Most modules require building from source on riscv64, with varying degrees of difficulty. **Hardware tested on Banana Pi F3** (2025-11-20): Sharp WASM works perfectly, but Prisma has a critical WASM parser bug.
 
 ### Quick Reference
 
 | Support Level | Count | Description |
 |---------------|-------|-------------|
-| **Full Support** | 3 | Official prebuilt binaries available |
-| **Experimental** | 2 | Work-in-progress or conditional support |
-| **Build from Source** | 12 | Must compile locally, generally works |
-| **No Support** | 3 | Platform-specific or abandoned |
+| **Full Support** | 3 | Official prebuilt binaries available (esbuild, rollup) |
+| **WASM Works** | 1 | Sharp WASM fully functional ✅ (hardware tested) |
+| **Experimental** | 1 | Work-in-progress native support (Sharp native) |
+| **Build from Source** | 11 | Must compile locally, generally works |
+| **Broken** | 1 | Prisma - WASM parser bug, no workaround ❌ |
+| **No Support** | 3 | Platform-specific (fsevents) or deprecated (node-sass) |
 
 ## Compatibility Matrix
 
@@ -24,7 +26,7 @@ Out of 20+ native modules analyzed, only **3 provide official riscv64 prebuilt b
 | Module | riscv64 Prebuilds | Language | Build Difficulty | Notes |
 |--------|-------------------|----------|------------------|-------|
 | **@next/swc** | No | Rust | Medium | Use `--no-default-features` to avoid ring v0.16.20 |
-| **sharp** | Experimental | C/C++ | Hard | Requires glibc 2.41+, libvips >= 8.15.3 |
+| **sharp** | WASM works ✅ | C/C++ | Easy (WASM) / Hard (native) | WASM: `npm install --cpu=wasm32 sharp` |
 | **esbuild** | **Yes** | Go | N/A | `@esbuild/linux-riscv64` available |
 | **lightningcss** | No (PR closed) | Rust | Medium | PR #651 was closed without merge |
 | **turbo** | No | Rust | Medium | Not commonly needed for Next.js apps |
@@ -42,7 +44,7 @@ Out of 20+ native modules analyzed, only **3 provide official riscv64 prebuilt b
 |--------|-------------------|----------|------------------|-------|
 | **better-sqlite3** | No | C++ | Easy | Pure SQLite, builds cleanly |
 | **sqlite3** | No | C++ | Easy | Uses node-pre-gyp |
-| **prisma** | No | Rust | Hard | Use `engineType: "client"` (v6.16.0+) for JS-only mode |
+| **prisma** | ❌ Broken | Rust | N/A | WASM parser bug - does not work on riscv64 |
 | **lmdb** | No | C | Medium | Falls back to JS if native unavailable |
 
 ### Authentication & Security
@@ -57,7 +59,7 @@ Out of 20+ native modules analyzed, only **3 provide official riscv64 prebuilt b
 
 | Module | riscv64 Prebuilds | Language | Build Difficulty | Notes |
 |--------|-------------------|----------|------------------|-------|
-| **sharp** | Experimental | C/C++ | Hard | See detailed section below |
+| **sharp** | WASM works ✅ | C/C++ | Easy (WASM) / Hard (native) | Hardware tested: WASM fully functional |
 | **canvas** (node-canvas) | No | C | Medium | Requires Cairo, Pango |
 | **skia-canvas** | No | Rust | Hard | Requires Rust toolchain |
 
@@ -104,33 +106,55 @@ Out of 20+ native modules analyzed, only **3 provide official riscv64 prebuilt b
 
 ### 2. sharp - PRIORITY HIGH
 
-**Status**: Experimental support (June 2025)
+**Status**: ✅ **WASM Works**, Native Experimental (June 2025)
 
-**Prebuilt Binary Status**: Work-in-progress in sharp-libvips
+**Hardware Test Results** (Banana Pi F3, 2025-11-20):
+- Sharp 0.34.5 with WASM backend: **Fully functional**
+- All operations tested successfully (resize, format conversion, blur, rotate, composite)
+- No crashes or errors on real riscv64 hardware
 
-**Requirements**:
-- glibc >= 2.41 (Ubuntu 25.04+ or Debian 13)
+**WASM Performance** (Banana Pi F3, 8 cores, Node.js v20.19.2):
+
+| Image Size | Resize | JPEG→WebP | PNG→JPEG | Blur | Grayscale |
+|------------|--------|-----------|----------|------|-----------|
+| **640×480** (small) | 169ms | 266ms | 67ms | 307ms | 67ms |
+| **1280×720** (medium) | 315ms | 778ms | 152ms | 882ms | 166ms |
+| **1920×1080** (large) | 604ms | 1753ms | 310ms | 1939ms | 345ms |
+| **3840×2160** (4K) | 606ms | 6949ms | 1228ms | 7686ms | 1279ms |
+
+**Performance Analysis**:
+- Small images: 57-307ms per operation
+- 4K images: 606-7686ms for heavy operations (blur, WebP conversion)
+- Performance scales predictably with image size
+- Suitable for development and low-traffic production
+
+**Recommendations**:
+1. **Development/Testing**: Use WASM (`npm install --cpu=wasm32 sharp`) - zero compilation needed
+2. **Production (Low Traffic)**: WASM acceptable for < 1000 images/day
+3. **Production (High Traffic)**: Build native libvips for 3-4x speedup (see [BUILDING-LIBVIPS.md](BUILDING-LIBVIPS.md))
+
+**Native Binary Status**:
+- Work-in-progress in sharp-libvips
+- Requires glibc >= 2.41 (Ubuntu 25.04+ or Debian 13)
 - Compiler flag: `-march=rv64gc`
-- Node.js 20.16.0 (Node 22/24 have limited riscv64 support)
 - libvips >= 8.15.3
-
-**Known Issues**:
-- Segfaults under QEMU emulation (suspected JPEG encoding issue)
-- "Feels too fragile at the moment" - maintainer
-- No native hardware testing by maintainers
+- Known issue: Segfaults under QEMU emulation
+- No native hardware testing by maintainers yet
 
 **Workarounds**:
-1. Build libvips from source, set `SHARP_FORCE_GLOBAL_LIBVIPS=1` (see [BUILDING-LIBVIPS.md](BUILDING-LIBVIPS.md))
-2. Use WASM fallback: `npm install --cpu=wasm32 sharp`
-3. Use `@img/sharp-wasm32` package
+1. **WASM** (Recommended): `npm install --cpu=wasm32 sharp` - ✅ Works perfectly
+2. **Build libvips from source**: Set `SHARP_FORCE_GLOBAL_LIBVIPS=1` (see [BUILDING-LIBVIPS.md](BUILDING-LIBVIPS.md))
+3. Use `@img/sharp-wasm32` package (alternative WASM distribution)
 
-**Performance Testing**:
-- Benchmark native vs WASM: `tests/native-deps-audit/sharp-benchmark.js`
-- Detailed build guide: [BUILDING-LIBVIPS.md](BUILDING-LIBVIPS.md)
+**Testing**:
+- Benchmark script: `tests/native-deps-audit/sharp-benchmark.js`
+- Full test results: [docs/testing/native-deps-test-results-2025-11-20.md](testing/native-deps-test-results-2025-11-20.md)
+- Build guide: [BUILDING-LIBVIPS.md](BUILDING-LIBVIPS.md)
 
 **References**:
 - [3] lovell. "Prebuilt binaries for linux-riscv64" sharp#4367. https://github.com/lovell/sharp/issues/4367
 - [4] lovell. "Enhancement: provide prebuilt binaries for linux-riscv64" sharp-libvips#223. https://github.com/lovell/sharp-libvips/issues/223
+- Hardware test results: [native-deps-test-results-2025-11-20.md](testing/native-deps-test-results-2025-11-20.md)
 
 ---
 
@@ -201,28 +225,49 @@ cargo build --release --target riscv64gc-unknown-linux-gnu
 
 ### 6. Prisma - PRIORITY MEDIUM
 
-**Status**: No riscv64 binary targets
+**Status**: ❌ **DOES NOT WORK** on riscv64 (WASM parser bug)
 
-**Workaround (Recommended)**: Use Rust-free mode (v6.16.0+)
+**Hardware Test Results** (Banana Pi F3, 2025-11-20):
+- Prisma 6.16.0 and 7.0.0 both fail during schema generation
+- Error: `RuntimeError: panicked at pest-2.8.1/src/iterators/pairs.rs:70:29: index out of bounds`
+- Root cause: Bug in WASM-compiled `pest` parser library on riscv64
+- Both `engineType: "client"` (JS-only) and native engine modes fail
+- Even basic schema validation crashes before any engine execution
 
-```prisma
-generator client {
-  provider   = "prisma-client-js"
-  engineType = "client"  // No Rust engine needed
-}
-```
+**Impact**:
+- ❌ Prisma cannot be used on riscv64 at all
+- ❌ No workaround available with current versions
+- ❌ Affects both Prisma 6.x and 7.x
 
-**Notes**:
-- Requires driver adapter (e.g., `@prisma/adapter-pg`)
-- No binary download required
-- Full ORM functionality preserved
+**Alternatives for Database Access on riscv64**:
+
+1. **Direct Database Clients** (Recommended):
+   - `pg` (PostgreSQL) - ✅ Pure JavaScript, works perfectly
+   - `mysql2` (MySQL/MariaDB) - ✅ Works
+   - `better-sqlite3` (SQLite) - ✅ Compiles and works
+
+2. **Other ORMs**:
+   - `sequelize` - Pure JavaScript ORM
+   - `typeorm` - TypeScript ORM with wide support
+   - `knex` - Query builder with no native dependencies
+
+3. **Remote Prisma Architecture**:
+   - Run Prisma on x64/arm64 server
+   - Access via REST/GraphQL API from riscv64 application
+   - Use Prisma Data Proxy
 
 **Testing**:
-- Automated test suite: `tests/native-deps-audit/prisma-jsonly-test.js`
-- Validates CRUD operations, relations, and performance
+- Test script: `tests/native-deps-audit/prisma-jsonly-test.js`
+- Full test results: [docs/testing/native-deps-test-results-2025-11-20.md](testing/native-deps-test-results-2025-11-20.md)
+
+**Upstream Action Needed**:
+- [ ] Report WASM parser bug to Prisma team
+- [ ] Request riscv64 native engine support
+- [ ] Offer Banana Pi F3 hardware for testing
 
 **References**:
 - [8] Prisma. "Prisma without Rust Engines" Prisma Docs. https://www.prisma.io/docs/orm/more/under-the-hood/engines
+- Hardware test results: [native-deps-test-results-2025-11-20.md](testing/native-deps-test-results-2025-11-20.md)
 
 ---
 
