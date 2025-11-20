@@ -120,9 +120,13 @@ Out of 20+ native modules analyzed, only **3 provide official riscv64 prebuilt b
 - No native hardware testing by maintainers
 
 **Workarounds**:
-1. Build libvips from source, set `SHARP_FORCE_GLOBAL_LIBVIPS=1`
+1. Build libvips from source, set `SHARP_FORCE_GLOBAL_LIBVIPS=1` (see [BUILDING-LIBVIPS.md](BUILDING-LIBVIPS.md))
 2. Use WASM fallback: `npm install --cpu=wasm32 sharp`
 3. Use `@img/sharp-wasm32` package
+
+**Performance Testing**:
+- Benchmark native vs WASM: `tests/native-deps-audit/sharp-benchmark.js`
+- Detailed build guide: [BUILDING-LIBVIPS.md](BUILDING-LIBVIPS.md)
 
 **References**:
 - [3] lovell. "Prebuilt binaries for linux-riscv64" sharp#4367. https://github.com/lovell/sharp/issues/4367
@@ -212,6 +216,10 @@ generator client {
 - Requires driver adapter (e.g., `@prisma/adapter-pg`)
 - No binary download required
 - Full ORM functionality preserved
+
+**Testing**:
+- Automated test suite: `tests/native-deps-audit/prisma-jsonly-test.js`
+- Validates CRUD operations, relations, and performance
 
 **References**:
 - [8] Prisma. "Prisma without Rust Engines" Prisma Docs. https://www.prisma.io/docs/orm/more/under-the-hood/engines
@@ -444,8 +452,57 @@ Help improve riscv64 support:
 - SWC: https://github.com/swc-project/swc
 - Sharp: https://github.com/lovell/sharp
 
+## Testing Tools
+
+Automated testing scripts are available in `tests/native-deps-audit/` to validate module functionality on riscv64:
+
+### Sharp Performance Benchmark
+
+**Location**: `tests/native-deps-audit/sharp-benchmark.js`
+
+Tests native libvips vs WASM performance across multiple operations:
+- Image resizing (640x480 to 3840x2160)
+- Format conversions (JPEG, PNG, WebP)
+- Transformations (rotate, blur, grayscale)
+- Composite operations
+
+**Usage**:
+```bash
+node sharp-benchmark.js --implementation=both
+```
+
+**Expected Output**: Performance comparison showing native is typically 3-4x faster
+
+### Prisma JS-Only Mode Test
+
+**Location**: `tests/native-deps-audit/prisma-jsonly-test.js`
+
+Validates Prisma Client in JavaScript-only mode (no Rust engines):
+- Client generation with `engineType: "client"`
+- CRUD operations
+- Relations and transactions
+- Performance benchmarking
+
+**Usage**:
+```bash
+node prisma-jsonly-test.js setup
+node prisma-jsonly-test.js test
+node prisma-jsonly-test.js cleanup
+```
+
+**Expected Output**: All tests pass, confirming JS-only mode works
+
+### Documentation
+
+See [tests/native-deps-audit/README.md](../tests/native-deps-audit/README.md) for complete testing documentation, troubleshooting, and contribution guidelines.
+
+---
+
 ## Updates Log
 
+- **2025-11-20**: Added testing tools section with automated test scripts
+- **2025-11-20**: Added libvips build guide reference
+- **2025-11-20**: Added prebuild hosting strategy
 - **2025-11-19**: Initial comprehensive audit
 - **2025-11-19**: Added 20+ native modules analysis
 - **2025-11-19**: Documented sharp experimental support status
@@ -454,9 +511,14 @@ Help improve riscv64 support:
 ## Related Documents
 
 - [BUILDING-SWC.md](BUILDING-SWC.md) - Complete guide to building @next/swc
+- [BUILDING-LIBVIPS.md](BUILDING-LIBVIPS.md) - Build libvips from source for sharp
+- [PREBUILD-HOSTING-STRATEGY.md](PREBUILD-HOSTING-STRATEGY.md) - Distribution and hosting strategy
 - [SWC-WORKAROUNDS.md](SWC-WORKAROUNDS.md) - Babel fallback and alternatives
+- [tests/native-deps-audit/](../tests/native-deps-audit/) - Automated testing scripts
 - Issue #2: Native Dependencies Audit (this document)
+- Issue #3: Prebuilt Binaries Strategy
 - Issue #9: ring crate compilation failure
+- Issue #21: Debian/Fedora Packaging
 
 ---
 
