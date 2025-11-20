@@ -93,7 +93,8 @@ cd packages/next-swc
 ### Step 4: Build Native Binary
 
 \`\`\`bash
-pnpm build-native
+source "$HOME/.cargo/env"
+cargo build --release --manifest-path crates/napi/Cargo.toml --no-default-features
 \`\`\`
 
 **⏱️ Expected Time**:
@@ -309,11 +310,12 @@ git checkout "$NEXT_VERSION"
 
 # Build
 cd packages/next-swc
-pnpm build-native
+source "$HOME/.cargo/env"
+cargo build --release --manifest-path crates/napi/Cargo.toml --no-default-features
 
 # Package
 mkdir -p "$OUTPUT_DIR"
-cp native/*.node "$OUTPUT_DIR/"
+cp target/release/*.node "$OUTPUT_DIR/"
 
 echo "Build complete: $OUTPUT_DIR"
 \`\`\`

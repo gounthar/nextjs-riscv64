@@ -11,7 +11,7 @@ set -euo pipefail
 DEFAULT_VERSION="v13.5.6"
 NEXT_VERSION="${1:-$DEFAULT_VERSION}"
 OUTPUT_DIR="${2:-./builds/${NEXT_VERSION}}"
-BUILD_DIR="/tmp/nextjs-swc-build-$$"
+BUILD_DIR=$(mktemp -d "/tmp/nextjs-swc-build.XXXXXXXXXX")
 LOG_FILE="${BUILD_DIR}/build.log"
 
 # Colors for output
