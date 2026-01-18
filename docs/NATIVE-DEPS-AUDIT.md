@@ -99,8 +99,8 @@ Out of 20+ native modules analyzed, only **3 provide official riscv64 prebuilt b
 3. Build from source
 
 **References**:
-- [1] gounthar. "nextjs-riscv64 BUILDING-SWC.md" GitHub, 2025. https://github.com/gounthar/nextjs-riscv64/blob/main/docs/BUILDING-SWC.md
-- [2] Vercel. "Next.js SWC Compiler" Next.js Docs. https://nextjs.org/docs/architecture/nextjs-compiler
+- [1] gounthar. "[nextjs-riscv64 BUILDING-SWC.md](https://github.com/gounthar/nextjs-riscv64/blob/main/docs/BUILDING-SWC.md)" GitHub, 2025.
+- [2] Vercel. "[Next.js SWC Compiler](https://nextjs.org/docs/architecture/nextjs-compiler)" Next.js Docs.
 
 ---
 
@@ -152,8 +152,8 @@ Out of 20+ native modules analyzed, only **3 provide official riscv64 prebuilt b
 - Build guide: [BUILDING-LIBVIPS.md](BUILDING-LIBVIPS.md)
 
 **References**:
-- [3] lovell. "Prebuilt binaries for linux-riscv64" sharp#4367. https://github.com/lovell/sharp/issues/4367
-- [4] lovell. "Enhancement: provide prebuilt binaries for linux-riscv64" sharp-libvips#223. https://github.com/lovell/sharp-libvips/issues/223
+- [3] lovell. "[Prebuilt binaries for linux-riscv64](https://github.com/lovell/sharp/issues/4367)" sharp#4367.
+- [4] lovell. "[Enhancement: provide prebuilt binaries for linux-riscv64](https://github.com/lovell/sharp-libvips/issues/223)" sharp-libvips#223.
 - Hardware test results: [native-deps-test-results-2025-11-20.md](testing/native-deps-test-results-2025-11-20.md)
 
 ---
@@ -178,7 +178,7 @@ npm install esbuild
 **Notes**: esbuild is written in Go which has good riscv64 support. This is one of the best-supported modules for the platform.
 
 **References**:
-- [5] evanw. "@esbuild/linux-riscv64" npm. https://www.npmjs.com/package/@esbuild/linux-riscv64
+- [5] evanw. "[@esbuild/linux-riscv64](https://www.npmjs.com/package/@esbuild/linux-riscv64)" npm.
 
 ---
 
@@ -199,7 +199,7 @@ npm install rollup
 ```
 
 **References**:
-- [6] rollup. "@rollup/rollup-linux-riscv64-gnu" npm. https://www.npmjs.com/package/@rollup/rollup-linux-riscv64-gnu
+- [6] rollup. "[@rollup/rollup-linux-riscv64-gnu](https://www.npmjs.com/package/@rollup/rollup-linux-riscv64-gnu)" npm.
 
 ---
 
@@ -219,7 +219,7 @@ cargo build --release --target riscv64gc-unknown-linux-gnu
 ```
 
 **References**:
-- [7] phanen. "feat(target): add riscv64 support" lightningcss#651. https://github.com/parcel-bundler/lightningcss/pull/651
+- [7] phanen. "[feat(target): add riscv64 support](https://github.com/parcel-bundler/lightningcss/pull/651)" lightningcss#651.
 
 ---
 
@@ -266,7 +266,7 @@ cargo build --release --target riscv64gc-unknown-linux-gnu
 - [ ] Offer Banana Pi F3 hardware for testing
 
 **References**:
-- [8] Prisma. "Prisma without Rust Engines" Prisma Docs. https://www.prisma.io/docs/orm/more/under-the-hood/engines
+- [8] Prisma. "[Prisma without Rust Engines](https://www.prisma.io/docs/orm/more/under-the-hood/engines)" Prisma Docs.
 - Hardware test results: [native-deps-test-results-2025-11-20.md](testing/native-deps-test-results-2025-11-20.md)
 
 ---
@@ -295,8 +295,8 @@ npx node-gyp rebuild -C ./node_modules/argon2
 ```
 
 **References**:
-- [9] kelektiv. "node.bcrypt.js" GitHub. https://github.com/kelektiv/node.bcrypt.js
-- [10] ranisalt. "node-argon2" GitHub. https://github.com/ranisalt/node-argon2
+- [9] kelektiv. "[node.bcrypt.js](https://github.com/kelektiv/node.bcrypt.js)" GitHub.
+- [10] ranisalt. "[node-argon2](https://github.com/ranisalt/node-argon2)" GitHub.
 
 ---
 
@@ -315,7 +315,7 @@ npx node-gyp rebuild -C ./node_modules/argon2
 - Falls back to node-gyp build automatically
 
 **References**:
-- [11] WiseLibs. "better-sqlite3" GitHub. https://github.com/WiseLibs/better-sqlite3
+- [11] WiseLibs. "[better-sqlite3](https://github.com/WiseLibs/better-sqlite3)" GitHub.
 
 ---
 
@@ -341,7 +341,7 @@ npm install canvas --build-from-source
 ```
 
 **References**:
-- [12] Automattic. "node-canvas" GitHub. https://github.com/Automattic/node-canvas
+- [12] Automattic. "[node-canvas](https://github.com/Automattic/node-canvas)" GitHub.
 
 ---
 
@@ -363,7 +363,7 @@ npm install sass
 - Active maintenance
 
 **References**:
-- [13] sass. "node-sass deprecation" GitHub. https://github.com/sass/node-sass
+- [13] sass. "[node-sass deprecation](https://github.com/sass/node-sass)" GitHub.
 
 ---
 
