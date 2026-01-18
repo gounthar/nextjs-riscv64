@@ -93,6 +93,11 @@ Out of 20+ native modules analyzed, only **3 provide official riscv64 prebuilt b
 - `ring v0.16.20` doesn't support riscv64
 - No official Vercel support planned
 
+**Upstream Path Forward**:
+- `ring` 0.17+ includes riscv64 support (merged Sept 2023 via [PR #1627](https://github.com/briansmith/ring/pull/1627))
+- Current blocker: Next.js dependency chain pins to `ring ^0.16` via `rustls v0.20.x`
+- Once `rustls` → `hyper-rustls` → `reqwest` → `turbo-tasks-fetch` upgrade to ring 0.17+, native builds will work without `--no-default-features`
+
 **Workarounds**:
 1. Use loader patch + pre-built binaries (see `patches/apply-nextjs-patch.sh`)
 2. Babel fallback for Next.js 13.5.6 (Pages Router only)
@@ -101,6 +106,7 @@ Out of 20+ native modules analyzed, only **3 provide official riscv64 prebuilt b
 **References**:
 - [1] gounthar. "[nextjs-riscv64 BUILDING-SWC.md](https://github.com/gounthar/nextjs-riscv64/blob/main/docs/BUILDING-SWC.md)" GitHub, 2025.
 - [2] Vercel. "[Next.js SWC Compiler](https://nextjs.org/docs/architecture/nextjs-compiler)" Next.js Docs.
+- [3] briansmith. "[Add riscv64 support](https://github.com/briansmith/ring/pull/1627)" ring#1627.
 
 ---
 
